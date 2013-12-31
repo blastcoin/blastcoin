@@ -4,13 +4,13 @@ Blastcoin integration/staging tree
 http://www.blastcoin.com
 
 Copyright (c) 2009-2013 Bitcoin Developers
-Copyright (c) 2011-2013 Litecoin Developers
+Copyright (c) 2011-2013 Blastcoin Developers
 Copyright (c) 2013 Blastcoin Developers
 
 What is Blastcoin?
 ----------------
 
-Blastcoin is a version of Litecoin using scrypt as a proof-of-work algorithm
+Blastcoin is a version of Blastcoin using scrypt as a proof-of-work algorithm
 and a unique difficulty and reward algorithm to encorage mining and
 maximize long term profitability.
  
