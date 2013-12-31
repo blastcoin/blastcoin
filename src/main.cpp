@@ -14,6 +14,8 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
 
 using namespace std;
 using namespace boost;
@@ -1061,18 +1063,58 @@ uint256 static GetOrphanRoot(const CBlockHeader* pblock)
     return pblock->GetHash();
 }
 
-int64 static GetBlockValue(int nHeight, int64 nFees)
+int static GenerateMTRandom(unsigned int s, int range)
 {
-    int64 nSubsidy = 50 * COIN;
+    random::mt19937 gen(s);
+    random::uniform_int_distribution<> dist(0, range);
+    return dist(gen);
+}
 
-    // Subsidy is cut in half every 840000 blocks, which will occur approximately every 4 years
-    nSubsidy >>= (nHeight / 840000); // Blastcoin: 840k blocks in ~4 years
+static const int64 nMinSubsidy = 1 * COIN;
+
+int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
+{
+    // normal payout
+    int64 nSubsidy = 1000 * COIN;
+
+    std::string cseed_str = prevHash.ToString().substr(12,7);
+    const char* cseed = cseed_str.c_str();
+    long seed = hex2long(cseed);
+    int rand = generateMTRandom(seed, 65280);
+
+    nSubsidy = (1000 + rand) * COIN;
+
+    if(nHeight == 1)
+    {
+        nSubsidy = CIRCULATION_MONEY * TAX_PERCENTAGE;
+    }
+    else if(nHeight < 8640)
+    {
+        nSubsidy *= 2;
+    }
+
+    cseed_str = prevHash.ToString().substr(10,7);
+    seed = hex2long(cseed);
+    rand = generateMTRandom(seed, 28799);
+
+    if(rand > 20000 && rand < 20011)
+        nSubsidy = 1000000 * COIN;
+    else if(rand > 11000 && rand < 11200)
+        nSubsidy = 50000 * COIN;
+    else if(rand > 25000 && rand < 25500)
+        nSubsidy = 10000 * COIN;
+
+    nSubsidy >>= (nHeight / 259200);
+    if (nSubsidy < nMinSubsidy)
+    {
+        nSubsidy = nMinSubsidy;
+    }
 
     return nSubsidy + nFees;
 }
 
-static const int64 nTargetTimespan = 3.5 * 24 * 60 * 60; // Blastcoin: 3.5 days
-static const int64 nTargetSpacing = 2.5 * 60; // Blastcoin: 2.5 minutes
+static const int64 nTargetTimespan = 120; // Blastcoin: 2 minute blocks
+static const int64 nTargetSpacing = 1 * 24 * 60 * 60; // Blastcoin: 1 day difficulty retargeting
 static const int64 nInterval = nTargetTimespan / nTargetSpacing;
 
 //
@@ -1691,11 +1733,12 @@ bool CBlock::ConnectBlock(CValidationState &state, CBlockIndex* pindex, CCoinsVi
         pos.nTxOffset += ::GetSerializeSize(tx, SER_DISK, CLIENT_VERSION);
     }
     int64 nTime = GetTimeMicros() - nStart;
+    uint256 prevHash = 0;
     if (fBenchmark)
         printf("- Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin)\n", (unsigned)vtx.size(), 0.001 * nTime, 0.001 * nTime / vtx.size(), nInputs <= 1 ? 0 : 0.001 * nTime / (nInputs-1));
 
-    if (vtx[0].GetValueOut() > GetBlockValue(pindex->nHeight, nFees))
-        return state.DoS(100, error("ConnectBlock() : coinbase pays too much (actual=%"PRI64d" vs limit=%"PRI64d")", vtx[0].GetValueOut(), GetBlockValue(pindex->nHeight, nFees)));
+    if (vtx[0].GetValueOut() > GetBlockValue(pindex->nHeight, nFees, prevHash))
+        return state.DoS(100, error("ConnectBlock() : coinbase pays too much (actual=%"PRI64d" vs limit=%"PRI64d")", vtx[0].GetValueOut(), GetBlockValue(pindex->nHeight, nFees, prevHash)));
 
     if (!control.Wait())
         return state.DoS(100, false);
@@ -2756,7 +2799,7 @@ bool InitBlockIndex() {
         //   vMerkleTree: 97ddfbbae6
 
         // Genesis block
-        const char* pszTimestamp = "NY Times 05/Oct/2011 Steve Jobs, Apple’s Visionary, Dies at 56";
+        const char* pszTimestamp = "NBC News 12/31/13 - New Year's Eve: Global revelers begin ringing in 2014";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2768,13 +2811,13 @@ bool InitBlockIndex() {
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1317972665;
+        block.nTime    = 1388520442;
         block.nBits    = 0x1e0ffff0;
         block.nNonce   = 2084524493;
 
         if (fTestNet)
         {
-            block.nTime    = 1317798646;
+            block.nTime    = 1388520442;
             block.nNonce   = 385270584;
         }
 
@@ -2783,7 +2826,7 @@ bool InitBlockIndex() {
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9"));
+        assert(block.hashMerkleRoot == uint256("0x"));
         block.print();
         assert(hash == hashGenesisBlock);
 
@@ -4405,7 +4448,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         nLastBlockSize = nBlockSize;
         printf("CreateNewBlock(): total size %"PRI64u"\n", nBlockSize);
 
-        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
+        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees, pindexPrev->GetBlockHash());
         pblocktemplate->vTxFees[0] = -nFees;
 
         // Fill in header
