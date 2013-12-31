@@ -1,9 +1,9 @@
-Building Litecoin
+Building Blastcoin
 
-See doc/readme-qt.rst for instructions on building Litecoin-Qt,
+See doc/readme-qt.rst for instructions on building Blastcoin-Qt,
 the intended-for-end-users, nice-graphical-interface, reference
-implementation of Litecoin.
+implementation of Blastcoin.
 
-See doc/build-*.txt for instructions on building litecoind,
+See doc/build-*.txt for instructions on building Blastcoind,
 the intended-for-services, no-graphical-interface, reference
-implementation of Litecoin.
+implementation of Blastcoin.
