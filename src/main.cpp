@@ -1070,51 +1070,70 @@ int static GenerateMTRandom(unsigned int s, int range)
     return dist(gen);
 }
 
-static const int64 nMinSubsidy = 1 * COIN;
+int static GetBlastBlockReward(int nRand, int nBaseReward, int nStep)
+{
+    int nBlastBlock, nBigBlast, nMiddleBlast, nLittleBlast = 0;
+
+    switch (nStep)
+    {
+        case 1:
+            nBigBlast = 1000000;
+            nMiddleBlast = 100000;
+            nLittleBlast = 50000;
+            break;
+        case 2:
+            nBigBlast = 1000000;
+            nMiddleBlast = 50000;
+            nLittleBlast = 25000;
+            break;
+        case 3:
+            nBigBlast = 1000000;
+            nMiddleBlast = 15000;
+            nLittleBlast = 5000;
+            break;
+    }
+
+    if(nRand > 20000 && nRand < 20011)
+        nBlastBlock = nBigBlast;
+    else if(nRand > 10000 && nRand < 11000)
+        nBlastBlock = nMiddleBlast;
+    else if(nRand > 15000 && nRand < 10000)
+        nSubsidy = nLittleBlast;
+
+    return nBaseReward + nBlastBlock;
+}
 
 int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
 {
-    // normal payout
-    int64 nSubsidy = 1000 * COIN;
-
-    std::string cseed_str = prevHash.ToString().substr(12,7);
-    const char* cseed = cseed_str.c_str();
-    long seed = hex2long(cseed);
-    int rand = generateMTRandom(seed, 65280);
-
-    nSubsidy = (1000 + rand) * COIN;
-
-    if(nHeight == 1)
-    {
-        nSubsidy = CIRCULATION_MONEY * TAX_PERCENTAGE;
-    }
-    else if(nHeight < 8640)
-    {
-        nSubsidy *= 2;
-    }
-
-    cseed_str = prevHash.ToString().substr(10,7);
-    seed = hex2long(cseed);
-    rand = generateMTRandom(seed, 28799);
-
-    if(rand > 20000 && rand < 20011)
-        nSubsidy = 1000000 * COIN;
-    else if(rand > 11000 && rand < 11200)
-        nSubsidy = 50000 * COIN;
-    else if(rand > 25000 && rand < 25500)
-        nSubsidy = 10000 * COIN;
-
-    nSubsidy >>= (nHeight / 259200);
-    if (nSubsidy < nMinSubsidy)
-    {
-        nSubsidy = nMinSubsidy;
-    }
-
+        int64 nSubsidy = 1000 * COIN;
+         
+        std::string cseed_str = prevHash.ToString().substr(7,7);
+        const char* cseed = cseed_str.c_str();
+        long seed = hex2long(cseed);
+        int rand = generateMTRandom(seed, 29999);
+       
+        if(nHeight < 1000)    
+        {
+            nSubsidy = 1000 * COIN;
+        }
+        else if(nHeight < 20000)      
+        {
+            nSubsidy =  GetBlastBlockReward(rand, 1000, 1) * COIN;
+        }
+        else if(nHeight < 100000)      
+        {
+            nSubsidy =  GetBlastBlockReward(rand, 1000, 2) * COIN;
+        }
+        else if(nHeight < 500000)      
+        {
+            nSubsidy =  GetBlastBlockReward(rand, 100, 3) * COIN;
+        }
+ 
     return nSubsidy + nFees;
 }
 
-static const int64 nTargetTimespan = 120; // Blastcoin: 2 minute blocks
-static const int64 nTargetSpacing = 1 * 24 * 60 * 60; // Blastcoin: 1 day difficulty retargeting
+static const int64 nTargetTimespan = 4 * 60 * 60; // Blastcoin: 4 hours
+static const int64 nTargetSpacing = 120; // Blastcoin: 2 minutes
 static const int64 nInterval = nTargetTimespan / nTargetSpacing;
 
 //
