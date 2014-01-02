@@ -33,7 +33,7 @@ CTxMemPool mempool;
 unsigned int nTransactionsUpdated = 0;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
-uint256 hashGenesisBlock("0x12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2");
+uint256 hashGenesisBlock("0x");
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // Blastcoin: starting difficulty is 1 / 2^12
 CBlockIndex* pindexGenesisBlock = NULL;
 int nBestHeight = -1;
@@ -1066,13 +1066,16 @@ uint256 static GetOrphanRoot(const CBlockHeader* pblock)
 int static GenerateMTRandom(unsigned int s, int range)
 {
     random::mt19937 gen(s);
-    random::uniform_int_distribution<> dist(0, range);
+    random::uniform_int_distribution<> dist(1, range);
     return dist(gen);
 }
 
 int static GetBlastBlockReward(int nRand, int nBaseReward, int nStep)
 {
-    int nBlastBlock, nBigBlast, nMiddleBlast, nLittleBlast = 0;
+    int nBlastBlock = 0;
+    int nBigBlast = 0;
+    int nMiddleBlast = 0;
+    int nLittleBlast = 0;
 
     switch (nStep)
     {
@@ -1098,35 +1101,35 @@ int static GetBlastBlockReward(int nRand, int nBaseReward, int nStep)
     else if(nRand > 10000 && nRand < 11000)
         nBlastBlock = nMiddleBlast;
     else if(nRand > 15000 && nRand < 10000)
-        nSubsidy = nLittleBlast;
+        nBlastBlock = nLittleBlast;
 
     return nBaseReward + nBlastBlock;
 }
 
 int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
 {
-        int64 nSubsidy = 1000 * COIN;
+        int64 nSubsidy = 100 * COIN;
          
         std::string cseed_str = prevHash.ToString().substr(7,7);
         const char* cseed = cseed_str.c_str();
         long seed = hex2long(cseed);
-        int rand = generateMTRandom(seed, 29999);
+        int rand = GenerateMTRandom(seed, 29999);
        
         if(nHeight < 1000)    
         {
-            nSubsidy = 1000 * COIN;
+            nSubsidy = 100 * COIN;
         }
         else if(nHeight < 20000)      
         {
-            nSubsidy =  GetBlastBlockReward(rand, 1000, 1) * COIN;
+            nSubsidy =  GetBlastBlockReward(rand, 500, 1) * COIN;
         }
         else if(nHeight < 100000)      
         {
             nSubsidy =  GetBlastBlockReward(rand, 1000, 2) * COIN;
         }
-        else if(nHeight < 500000)      
+        else if(nHeight < 250000)      
         {
-            nSubsidy =  GetBlastBlockReward(rand, 100, 3) * COIN;
+            nSubsidy =  GetBlastBlockReward(rand, 5000, 3) * COIN;
         }
  
     return nSubsidy + nFees;
@@ -2785,7 +2788,7 @@ bool LoadBlockIndex()
         pchMessageStart[1] = 0xc1;
         pchMessageStart[2] = 0xb7;
         pchMessageStart[3] = 0xdc;
-        hashGenesisBlock = uint256("0xf5ae71e26c74beacc88382716aced69cddf3dffff24f384e1808905e0188f68f");
+        hashGenesisBlock = uint256("0x");
     }
 
     //
@@ -2818,7 +2821,7 @@ bool InitBlockIndex() {
         //   vMerkleTree: 97ddfbbae6
 
         // Genesis block
-        const char* pszTimestamp = "NBC News 12/31/13 - New Year's Eve: Global revelers begin ringing in 2014";
+        const char* pszTimestamp = "NBC News 01/01/14 - New Year's Eve: Global revelers begin ringing in 2014";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2830,13 +2833,13 @@ bool InitBlockIndex() {
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1388520442;
+        block.nTime    = 1388563200;
         block.nBits    = 0x1e0ffff0;
         block.nNonce   = 2084524493;
 
         if (fTestNet)
         {
-            block.nTime    = 1388520442;
+            block.nTime    = 1388563200;
             block.nNonce   = 385270584;
         }
 
@@ -2845,7 +2848,7 @@ bool InitBlockIndex() {
         printf("%s\n", hash.ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
-        assert(block.hashMerkleRoot == uint256("0x"));
+        assert(block.hashMerkleRoot == uint256("6aa9575515f44b894e367e25865d0d974a5e05c46ff20a07cb51f8393845f70f"));
         block.print();
         assert(hash == hashGenesisBlock);
 
