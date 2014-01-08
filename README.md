@@ -10,15 +10,38 @@ Copyright (c) 2013 Blastcoin Developers
 What is Blastcoin?
 ----------------
 
-Blastcoin is a version of Blastcoin using scrypt as a proof-of-work algorithm
-and a unique difficulty and reward algorithm to encorage mining and
-maximize long term profitability.
+Blastcoin is a descendent of Litecoin using scrypt as a proof-of-work algorithm
+and a unique difficulty and reward algorithm to encorage fair mining and
+maximize both short and long term profitability.
  
+## The Basics
  - 1 minute block targets
- - subsidy halves in 1000k blocks (~4 years)
  - 1 billion total coins
- - 1000 coins per block
- - 10000 blocks to retarget difficulty
+ - Difficulty retargets every 4 hours
+ - Unique block reward system
+ - Every block has the possibility of being a different sized Blast Block
+
+## Block reward system
+ - Blocks 1-10000 = 100 coins per block (instamine resistant)
+ - Blocks 10000-50000 = 1000 coins per block
+ - Blocks 50000-150000 = 7500 coins per block
+ - Blocks 150000-500000 = 5000 coins per block
+ - Blocks 500000+ = 10000 coins per block (difficulty/reward adjustment)
+
+## Blast block rewards
+- Blocks 1-50000 - no blast blocks available
+- Blocks 50000-150000
+ 	Big Blast Block = 1000000 coins + standard block reward
+    Blast Block = 100000 coins + standard block reward
+    Baby Blast Block = 50000 coins + standard block reward
+- Blocks 150000-500000
+ 	Big Blast Block = 1000000 coins + standard block reward
+    Blast Block = 50000 coins + standard block reward
+    Baby Blast Block = 25000 coins + standard block reward
+- Blocks 500000+
+ 	Big Blast Block = 1000000 coins + standard block reward
+    Blast Block = 15000 coins + standard block reward
+    Baby Blast Block = 5000 coins + standard block reward
 
 For more information, as well as an immediately useable, binary version of
 the Blastcoin client sofware, see http://www.blastcoin.com.
