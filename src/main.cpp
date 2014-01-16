@@ -1071,6 +1071,11 @@ int static GetBlastBlockReward(int nRand, int nBaseReward, int nStep)
             nMiddleBlast = 15000;
             nLittleBlast = 5000;
             break;
+        case 4:
+            nBigBlast = 1000000;
+            nMiddleBlast = 5000;
+            nLittleBlast = 2500;
+            break;            
     }
 
     if(nRand > 20000 && nRand < 20011)
@@ -1092,28 +1097,37 @@ int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
         long seed = hex2long(cseed);
         int rand = GenerateMTRandom(seed, 29999);
        
+        // anti-instamine phase
         if(nHeight < 10000)    
         {
-            nSubsidy = 1000 * COIN;
+            nSubsidy = 100 * COIN;
         }
+        // warm up phase
+        else if(nHeight < 20000)      
+        {
+            nSubsidy =  GetBlastBlockReward(rand, 2500, 1) * COIN;
+        }
+        // gold rush phase
         else if(nHeight < 50000)      
         {
-            nSubsidy =  GetBlastBlockReward(rand, 7500, 1) * COIN;
+            nSubsidy =  GetBlastBlockReward(rand, 10000, 2) * COIN;
         }
+        // sustainment phase
         else if(nHeight < 150000)      
         {
-            nSubsidy =  GetBlastBlockReward(rand, 5000, 2) * COIN;
+            nSubsidy =  GetBlastBlockReward(rand, 2500, 3) * COIN;
         }
-        else if(nHeight < 500000)      
+        // scarcity phase
+        else if(nHeight < 250000)      
         {
-            nSubsidy =  GetBlastBlockReward(rand, 10000, 3) * COIN;
+            nSubsidy =  GetBlastBlockReward(rand, 750, 4) * COIN;
         }
- 
+
     return nSubsidy + nFees;
 }
 
-static const int64 nTargetTimespan = 4 * 60 * 60; // Blastcoin: 4 hours
-static const int64 nTargetSpacing = 60; // Blastcoin: 1 minutes
+static const int64 nTargetTimespan = 600; // Blastcoin: 10 minutes
+static const int64 nTargetSpacing = 60; // Blastcoin: 1 minute 
 static const int64 nInterval = nTargetTimespan / nTargetSpacing;
 
 //
@@ -2765,7 +2779,7 @@ bool InitBlockIndex() {
         //   vMerkleTree: 97ddfbbae6
 
         // Genesis block
-        const char* pszTimestamp = "NBC News 01/01/14 - New Year's Eve: Global revelers begin ringing in 2014";
+        const char* pszTimestamp = "Adison - Olivia - Stephanie - I love you!";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -2777,13 +2791,13 @@ bool InitBlockIndex() {
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1388626372;
+        block.nTime    = 1389336332;
         block.nBits    = 0x1e0ffff0;
         block.nNonce   = 1089708;
 
         if (fTestNet)
         {
-            block.nTime    = 1388626372;
+            block.nTime    = 1389336332;
             block.nNonce   = 1089708;
         }
 
