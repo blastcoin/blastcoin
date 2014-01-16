@@ -1,11 +1,11 @@
 Blastcoin integration/staging tree
 ================================
 
-http://www.blastcoin.com
+- http://www.blastcoin.com
 
-Copyright (c) 2009-2013 Bitcoin Developers
-Copyright (c) 2011-2013 Litecoin Developers
-Copyright (c) 2014 Blastcoin Developers
+- Copyright (c) 2009-2013 Bitcoin Developers
+- Copyright (c) 2011-2013 Litecoin Developers
+- Copyright (c) 2014 Blastcoin Developers
 
 What is Blastcoin?
 ----------------
@@ -23,31 +23,46 @@ maximize both short and long term profitability.
  - Unique block reward system
  - Every block has the possibility of being a different sized Blast Block
 ```
+
 ## Block reward system
 ```
-** Anti-instamine phase 
+ANTI-INSTAMINE PHASE
  - Blocks 1-10000 = 100 coins per block
 
- - Blocks 10000-50000 = 1000 coins per block
- - Blocks 50000-100000 = 7500 coins per block
- - Blocks 100000-300000 = 5000 coins per block
- - Blocks 300000-500000 = 10000 coins per block
- - Blocks 500000+ = 1000 coins per block
+WARM UP PHASE
+ - Blocks 10000-20000 = 2500 coins per block
+
+RAMPING PHASE
+ - Blocks 20000-50000 = 5000 coins per block
+
+GOLD RUSH PHASE
+ - Blocks 50000-150000 = 10000 coins per block
+
+SUSTAINMENT PHASE
+ - Blocks 150000-250000 = 2500 coins per block
+
+SCARCITY PHASE
+ - Blocks 250000+ = 500 coins per block
+```
 
 ## Blast block rewards
 - Blocks 1-50000 - no blast blocks available
+
 - Blocks 50000-100000
  	Big Blast Block = 1000000 coins + standard block reward
     Blast Block = 100000 coins + standard block reward
     Baby Blast Block = 50000 coins + standard block reward
+
 - Blocks 100000-300000
  	Big Blast Block = 1000000 coins + standard block reward
     Blast Block = 50000 coins + standard block reward
     Baby Blast Block = 25000 coins + standard block reward
+
 - Blocks 300000-500000
  	Big Blast Block = 1000000 coins + standard block reward
     Blast Block = 15000 coins + standard block reward
     Baby Blast Block = 5000 coins + standard block reward
+
 - Blocks 500000+
  	Big Blast Block = 1000000 coins + standard block reward
     Blast Block = 50000 coins + standard block reward

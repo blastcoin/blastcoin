@@ -1057,25 +1057,30 @@ int static GetBlastBlockReward(int nRand, int nBaseReward, int nStep)
     switch (nStep)
     {
         case 1:
-            nBigBlast = 1000000;
-            nMiddleBlast = 100000;
-            nLittleBlast = 50000;
+            nBigBlast = 500000;
+            nMiddleBlast = 25000;
+            nLittleBlast = 10000;
             break;
         case 2:
-            nBigBlast = 1000000;
+            nBigBlast = 750000;
             nMiddleBlast = 50000;
             nLittleBlast = 25000;
             break;
         case 3:
             nBigBlast = 1000000;
-            nMiddleBlast = 15000;
-            nLittleBlast = 5000;
+            nMiddleBlast = 100000;
+            nLittleBlast = 50000;
             break;
         case 4:
-            nBigBlast = 1000000;
+            nBigBlast = 750000;
+            nMiddleBlast = 50000;
+            nLittleBlast = 25000;
+            break;       
+        case 5:
+            nBigBlast = 100000;
             nMiddleBlast = 5000;
             nLittleBlast = 2500;
-            break;            
+            break;                  
     }
 
     if(nRand > 20000 && nRand < 20011)
@@ -1098,29 +1103,34 @@ int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
         int rand = GenerateMTRandom(seed, 29999);
        
         // anti-instamine phase
-        if(nHeight < 10000)    
+        if(nHeight <= 10000)    
         {
             nSubsidy = 100 * COIN;
         }
         // warm up phase
-        else if(nHeight < 20000)      
+        else if(nHeight <= 20000)      
         {
             nSubsidy =  GetBlastBlockReward(rand, 2500, 1) * COIN;
         }
-        // gold rush phase
-        else if(nHeight < 50000)      
+        // ramping phase
+        else if(nHeight <= 50000)      
         {
-            nSubsidy =  GetBlastBlockReward(rand, 10000, 2) * COIN;
+            nSubsidy =  GetBlastBlockReward(rand, 5000, 2) * COIN;
+        }
+        // gold rush phase
+        else if(nHeight <= 150000)      
+        {
+            nSubsidy =  GetBlastBlockReward(rand, 10000, 3) * COIN;
         }
         // sustainment phase
-        else if(nHeight < 150000)      
+        else if(nHeight <= 250000)      
         {
-            nSubsidy =  GetBlastBlockReward(rand, 2500, 3) * COIN;
+            nSubsidy =  GetBlastBlockReward(rand, 2500, 4) * COIN;
         }
         // scarcity phase
-        else if(nHeight < 250000)      
+        else if(nHeight > 250000)
         {
-            nSubsidy =  GetBlastBlockReward(rand, 750, 4) * COIN;
+            nSubsidy = GetBlastBlockReward(rand, 500, 5) * COIN;
         }
 
     return nSubsidy + nFees;
