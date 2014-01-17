@@ -1,4 +1,4 @@
-<p align="center">![Blastcoin](http://blastcoin.com/blastcoin.png)</p>
+![Blastcoin](http://blastcoin.com/blastcoin.png)
 
 Welcome to Blastcoin
 ================================
