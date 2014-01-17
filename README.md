@@ -1,3 +1,5 @@
+![Blastcoin](http://blastcoin.com/blastcoin.png)
+
 Welcome to Blastcoin
 ================================
 
