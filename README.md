@@ -19,7 +19,6 @@ maximize both short and long term profitability.
 ```
  - 1 minute block targets
  - 1 billion total coins
- - 60 second blocks
  - 10 minute difficulty adjustments
  - Unique block reward system
  - Every block has the possibility of being a different sized Blast Block
@@ -28,22 +27,22 @@ maximize both short and long term profitability.
 ## Block reward system
 ```
 ANTI-INSTAMINE PHASE
- - Blocks 1-10000 = 100 coins per block
+ - Blocks 1-5000 = 100 coins per block
 
 WARM UP PHASE
- - Blocks 10000-20000 = 2500 coins per block
+ - Blocks 5000-20000 = 2500 coins per block
 
 RAMPING PHASE
  - Blocks 20000-50000 = 5000 coins per block
 
 GOLD RUSH PHASE
- - Blocks 50000-150000 = 10000 coins per block
+ - Blocks 50000-75000 = 10000 coins per block
 
 SUSTAINMENT PHASE
- - Blocks 150000-250000 = 2500 coins per block
+ - Blocks 75000-200000 = 2500 coins per block
 
 SCARCITY PHASE
- - Blocks 250000+ = 500 coins per block
+ - Blocks 200000+ = 500 coins per block
 ```
 
 ## Blast block rewards

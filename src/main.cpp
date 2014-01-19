@@ -1103,7 +1103,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
         int rand = GenerateMTRandom(seed, 29999);
        
         // anti-instamine phase
-        if(nHeight <= 10000)    
+        if(nHeight <= 5000)    
         {
             nSubsidy = 100 * COIN;
         }
@@ -1118,19 +1118,24 @@ int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
             nSubsidy =  GetBlastBlockReward(rand, 5000, 2) * COIN;
         }
         // gold rush phase
-        else if(nHeight <= 150000)      
+        else if(nHeight <= 75000)      
         {
             nSubsidy =  GetBlastBlockReward(rand, 10000, 3) * COIN;
         }
         // sustainment phase
-        else if(nHeight <= 250000)      
+        else if(nHeight <= 200000)      
         {
             nSubsidy =  GetBlastBlockReward(rand, 2500, 4) * COIN;
         }
         // scarcity phase
-        else if(nHeight > 250000)
+        else if(nHeight > 200000 && nHeight < 699000)
         {
             nSubsidy = GetBlastBlockReward(rand, 500, 5) * COIN;
+        }
+        // hard limit when out of coins
+        else if(nHeight >= 699000)
+        {
+            nSubsidy = 0 * COIN;
         }
 
     return nSubsidy + nFees;
