@@ -900,6 +900,25 @@ int CMerkleTx::GetDepthInMainChain(CBlockIndex* &pindexRet) const
     return pindexBest->nHeight - pindex->nHeight + 1;
 }
 
+double ConvertBitsToDouble(unsigned int nBits){
+    int nShift = (nBits >> 24) & 0xff;
+
+    double dDiff =
+        (double)0x0000ffff / (double)(nBits & 0x00ffffff);
+
+    while (nShift < 29)
+    {
+        dDiff *= 256.0;
+        nShift++;
+    }
+    while (nShift > 29)
+    {
+        dDiff /= 256.0;
+        nShift--;
+    }
+
+    return dDiff;
+}
 
 int CMerkleTx::GetBlocksToMaturity() const
 {
@@ -1072,22 +1091,17 @@ int static GetBlastBlockReward(int nRand, int nBaseReward, int nStep)
             nLittleBlast = 50000;
             break;
         case 4:
-            nBigBlast = 750000;
-            nMiddleBlast = 50000;
-            nLittleBlast = 25000;
-            break;       
-        case 5:
             nBigBlast = 100000;
             nMiddleBlast = 5000;
             nLittleBlast = 2500;
             break;                  
     }
 
-    if(nRand > 20000 && nRand < 20011)
+    if(nRand > 20000 && nRand < 21000)
         nBlastBlock = nBigBlast;
-    else if(nRand > 10000 && nRand < 11000)
+    else if(nRand > 5000 && nRand < 10000)
         nBlastBlock = nMiddleBlast;
-    else if(nRand > 15000 && nRand < 10000)
+    else if(nRand > 1 && nRand < 5000)
         nBlastBlock = nLittleBlast;
 
     return nBaseReward + nBlastBlock;
@@ -1095,7 +1109,7 @@ int static GetBlastBlockReward(int nRand, int nBaseReward, int nStep)
 
 int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
 {
-        int64 nSubsidy = 100 * COIN;
+        int64 nSubsidy = 1 * COIN;
          
         std::string cseed_str = prevHash.ToString().substr(7,7);
         const char* cseed = cseed_str.c_str();
@@ -1103,37 +1117,32 @@ int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
         int rand = GenerateMTRandom(seed, 29999);
        
         // anti-instamine phase
-        if(nHeight <= 5000)    
+        if(nHeight <= 1000)    
         {
             nSubsidy = 100 * COIN;
         }
-        // warm up phase
-        else if(nHeight <= 20000)      
+        // ramping phase
+        else if(nHeight <= 5000)      
         {
             nSubsidy =  GetBlastBlockReward(rand, 2500, 1) * COIN;
         }
-        // ramping phase
-        else if(nHeight <= 50000)      
-        {
-            nSubsidy =  GetBlastBlockReward(rand, 5000, 2) * COIN;
-        }
         // gold rush phase
-        else if(nHeight <= 75000)      
+        else if(nHeight <= 20000)      
         {
-            nSubsidy =  GetBlastBlockReward(rand, 10000, 3) * COIN;
+            nSubsidy =  GetBlastBlockReward(rand, 10000, 2) * COIN;
         }
         // sustainment phase
-        else if(nHeight <= 200000)      
+        else if(nHeight <= 100000)      
         {
-            nSubsidy =  GetBlastBlockReward(rand, 2500, 4) * COIN;
+            nSubsidy =  GetBlastBlockReward(rand, 2500, 3) * COIN;
         }
         // scarcity phase
-        else if(nHeight > 200000 && nHeight < 699000)
+        else if(nHeight > 100000 && nHeight < 380000)
         {
-            nSubsidy = GetBlastBlockReward(rand, 500, 5) * COIN;
+            nSubsidy = GetBlastBlockReward(rand, 500, 4) * COIN;
         }
         // hard limit when out of coins
-        else if(nHeight >= 699000)
+        else if(nHeight >= 380000)
         {
             nSubsidy = 0 * COIN;
         }
@@ -1141,7 +1150,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees, uint256 prevHash)
     return nSubsidy + nFees;
 }
 
-static const int64 nTargetTimespan = 600; // Blastcoin: 10 minutes
+static const int64 nTargetTimespan = 60; // Blastcoin: 1 minute
 static const int64 nTargetSpacing = 60; // Blastcoin: 1 minute 
 static const int64 nInterval = nTargetTimespan / nTargetSpacing;
 
@@ -1170,7 +1179,95 @@ unsigned int ComputeMinWork(unsigned int nBase, int64 nTime)
     return bnResult.GetCompact();
 }
 
+unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const CBlockHeader *pblock, uint64 TargetBlocksSpacingSeconds, uint64 PastBlocksMin, uint64 PastBlocksMax) {
+    /* current difficulty formula, megacoin - kimoto gravity well */
+    const CBlockIndex  *BlockLastSolved             = pindexLast;
+    const CBlockIndex  *BlockReading                = pindexLast;
+    const CBlockHeader *BlockCreating               = pblock;
+                        BlockCreating               = BlockCreating;
+    uint64              PastBlocksMass              = 0;
+    int64               PastRateActualSeconds       = 0;
+    int64               PastRateTargetSeconds       = 0;
+    double              PastRateAdjustmentRatio     = double(1);
+    CBigNum             PastDifficultyAverage;
+    CBigNum             PastDifficultyAveragePrev;
+    double              EventHorizonDeviation;
+    double              EventHorizonDeviationFast;
+    double              EventHorizonDeviationSlow;
+
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || (uint64)BlockLastSolved->nHeight < PastBlocksMin) { return bnProofOfWorkLimit.GetCompact(); }
+
+    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
+        if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
+        PastBlocksMass++;
+
+        if (i == 1) { PastDifficultyAverage.SetCompact(BlockReading->nBits); }
+        else        { PastDifficultyAverage = ((CBigNum().SetCompact(BlockReading->nBits) - PastDifficultyAveragePrev) / i) + PastDifficultyAveragePrev; }
+        PastDifficultyAveragePrev = PastDifficultyAverage;
+
+        PastRateActualSeconds           = BlockLastSolved->GetBlockTime() - BlockReading->GetBlockTime();
+        PastRateTargetSeconds           = TargetBlocksSpacingSeconds * PastBlocksMass;
+        PastRateAdjustmentRatio         = double(1);
+        if (PastRateActualSeconds < 0) { PastRateActualSeconds = 0; }
+        if (PastRateActualSeconds != 0 && PastRateTargetSeconds != 0) {
+        PastRateAdjustmentRatio         = double(PastRateTargetSeconds) / double(PastRateActualSeconds);
+        }
+        EventHorizonDeviation           = 1 + (0.7084 * pow((double(PastBlocksMass)/double(144)), -1.228));
+        EventHorizonDeviationFast       = EventHorizonDeviation;
+        EventHorizonDeviationSlow       = 1 / EventHorizonDeviation;
+
+        if (PastBlocksMass >= PastBlocksMin) {
+            if ((PastRateAdjustmentRatio <= EventHorizonDeviationSlow) || (PastRateAdjustmentRatio >= EventHorizonDeviationFast)) { assert(BlockReading); break; }
+        }
+        if (BlockReading->pprev == NULL) { assert(BlockReading); break; }
+        BlockReading = BlockReading->pprev;
+    }
+
+    CBigNum bnNew(PastDifficultyAverage);
+    if (PastRateActualSeconds != 0 && PastRateTargetSeconds != 0) {
+        bnNew *= PastRateActualSeconds;
+        bnNew /= PastRateTargetSeconds;
+    }
+    if (bnNew > bnProofOfWorkLimit) { bnNew = bnProofOfWorkLimit; }
+
+    /// debug print
+    printf("Difficulty Retarget - Kimoto Gravity Well\n");
+    printf("PastRateAdjustmentRatio = %g\n", PastRateAdjustmentRatio);
+    printf("Before: %08x  %s\n", BlockLastSolved->nBits, CBigNum().SetCompact(BlockLastSolved->nBits).getuint256().ToString().c_str());
+    printf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());
+
+    return bnNew.GetCompact();
+}
+
+unsigned int static GetNextWorkRequired_V2(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
+{
+    static const int64  BlocksTargetSpacing         = 2.5 * 60; // 2.5 minutes
+    unsigned int        TimeDaySeconds              = 60 * 60 * 24;
+    int64               PastSecondsMin              = TimeDaySeconds * 0.25;
+    int64               PastSecondsMax              = TimeDaySeconds * 7;
+    uint64              PastBlocksMin               = PastSecondsMin / BlocksTargetSpacing;
+    uint64              PastBlocksMax               = PastSecondsMax / BlocksTargetSpacing; 
+
+    return KimotoGravityWell(pindexLast, pblock, BlocksTargetSpacing, PastBlocksMin, PastBlocksMax);
+}
+
 unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
+{
+    int DiffMode = 1;
+    if (fTestNet) {
+        if (pindexLast->nHeight+1 >= 1337) { DiffMode = 2; }
+    }
+    else {
+        if (pindexLast->nHeight+1 >= 1000) { DiffMode = 2; }
+    }
+
+    if      (DiffMode == 1) { return GetNextWorkRequired_V1(pindexLast, pblock); }
+    else if (DiffMode == 2) { return GetNextWorkRequired_V2(pindexLast, pblock); }
+    return GetNextWorkRequired_V2(pindexLast, pblock);
+}
+
+
+unsigned int static GetNextWorkRequired_V1(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
     unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
 
