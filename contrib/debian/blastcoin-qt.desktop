@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=BlastCoin
+Comment=BlastCoin P2P Cryptocurrency
+Comment[fr]=BlastCoin, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=BlastCoin, eşten eşe kriptografik sanal para birimi
+Comment[es]=BlastCoin, una criptomoneda P2P
+Exec=/usr/bin/blastcoin-qt
+Terminal=false
+Type=Application
+Icon=/usr/share/pixmaps/bitcoin80.xpm
+MimeType=x-scheme-handler/blastcoin;
+Categories=Office;

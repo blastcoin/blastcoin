@@ -1,0 +1,2 @@
+debian/bin/blastcoind usr/bin
+src/blastcoind usr/lib/blastcoin

@@ -1,11 +1,14 @@
-Blastcoin 0.8.x BETA
 
-Copyright (c) 2009-2013 Bitcoin Developers
-Copyright (c) 2011-2013 Litecoin Developers
-Copyright (c) 2014 Blastcoin Developers
+Copyright (c) 2013-2014 BlastCoin Developers
 
+
+BlastCoin 0.3.0 BETA
+
+Copyright (c) 2013-2014 BlastCoin Developers
+Copyright (c) 2013 NovaCoin Developers
+Copyright (c) 2011-2012 Bitcoin Developers
 Distributed under the MIT/X11 software license, see the accompanying
-file COPYING or http://www.opensource.org/licenses/mit-license.php.
+file license.txt or http://www.opensource.org/licenses/mit-license.php.
 This product includes software developed by the OpenSSL Project for use in
 the OpenSSL Toolkit (http://www.openssl.org/).  This product includes
 cryptographic software written by Eric Young (eay@cryptsoft.com).
@@ -13,18 +16,37 @@ cryptographic software written by Eric Young (eay@cryptsoft.com).
 
 Intro
 -----
-Blastcoin is a free open source peer-to-peer electronic cash system that is
-completely decentralized, without the need for a central server or trusted
-parties.  Users hold the crypto keys to their own money and transact directly
-with each other, with the help of a P2P network to check for double-spending.
-
+BlastCoin is a free open source project derived from NovaCoin, with
+the goal of providing a long-term energy-efficient scrypt-based crypto-currency.
+Built on the foundation of Bitcoin and NovaCoin, innovations such as proof-of-stake
+help further advance the field of crypto-currency.
 
 Setup
 -----
-Unpack the files into a directory and run blastcoin-qt.exe.
+After completing windows setup then run windows command line (cmd)
+  cd daemon
+  blastcoind
+You would need to create a configuration file blastcoin.conf in the default
+wallet directory. Grant access to blastcoind.exe in anti-virus and firewall
+applications if necessary.
 
-Blastcoin-Qt is the original Blastcoin client and it builds the backbone of the network.
-However, it downloads and stores the entire history of Blastcoin transactions;
-depending on the speed of your computer and network connection, the synchronization
-process can take anywhere from a few hours to a day or more.
+The software automatically finds other nodes to connect to.  You can
+enable Universal Plug and Play (UPnP) with your router/firewall
+or forward port 12788 (TCP) to your computer so you can receive
+incoming connections.  BlastCoin works without incoming connections,
+but allowing incoming connections helps the BlastCoin network.
+
+Upgrade
+-------
+All you existing coins/transactions should be intact with the upgrade.
+To upgrade first backup wallet
+blastcoind backupwallet <destination_backup_file>
+Then shutdown blastcoind by
+blastcoind stop
+Start up the new blastcoind.
+
+
+See the documentation/wiki at the BlastCoin site:
+  http://blastcoin.cc/
+for help and more information.
 
