@@ -936,31 +936,18 @@ int generateMTRandom(unsigned int s, int range)
 
 
 
-static const int64 nMinSubsidy = 1 * COIN;
-static const int CUTOFF_HEIGHT = 100800;	// Height at the end of 5 weeks
 // miner's coin base reward based on nBits
 int64 GetProofOfWorkReward(int nHeight, int64 nFees, uint256 prevHash)
 {
-	int64 nSubsidy = 100000 * COIN;
+	int64 nSubsidy = 1 * COIN;
 
-	if(nHeight == 1)
+	if(nHeight <= 100)
 	{
-		nSubsidy = TAX_PERCENTAGE * CIRCULATION_MONEY;
+		nSubsidy = BLAST_MONEY; // 100 mil x 100 blocks = 10 bil
 		return nSubsidy + nFees;
 	}
-	else if(nHeight > CUTOFF_HEIGHT)
-	{
-		return nMinSubsidy + nFees;
-	}
 
-	std::string cseed_str = prevHash.ToString().substr(14,7);
-	const char* cseed = cseed_str.c_str();
-	long seed = hex2long(cseed);
-	nSubsidy += generateMTRandom(seed, 800000) * COIN;
-
-	// Subsidy is cut in half every week or 20160 blocks, which will occur approximately every month
-	nSubsidy >>= (nHeight / 20160); 
-    return nSubsidy + nFees;
+    return nSubsidy + nFees; // 1 coin mining reward until POW expires
 }
 
 // miner's coin stake reward based on nBits and coin age spent (coin-days)
@@ -2552,7 +2539,7 @@ bool LoadBlockIndex(bool fAllowNew)
             return false;
 
         // Genesis block
-        const char* pszTimestamp = "Feb 2, 2014: The Denver Broncos finally got on the board with a touchdown in the final seconds of the third quarter. But the Seattle Seahawks are dominating the Broncos 36-8";
+        const char* pszTimestamp = "Adison, Olivia, Stephanie, I love you";
         CTransaction txNew;
         txNew.nTime = nChainStartTime;
         txNew.vin.resize(1);
@@ -2565,9 +2552,9 @@ bool LoadBlockIndex(bool fAllowNew)
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1391393693;
+        block.nTime    = 1396659215;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = 12488421;
+        block.nNonce   = 1622753;
 
         //// debug print
         block.print();
@@ -2576,7 +2563,7 @@ bool LoadBlockIndex(bool fAllowNew)
         printf("block.nTime = %u \n", block.nTime);
         printf("block.nNonce = %u \n", block.nNonce);
 
-        assert(block.hashMerkleRoot == uint256("cf174ca43b1b30e9a27f7fdc20ff9caf626499d023f1f033198fdbadf73ca747"));
+        assert(block.hashMerkleRoot == uint256("0xe57e08bc096f62cb21409fd8eacdb8178c7c445627c63ce33e4f0df3d359e115"));
 		assert(block.GetHash() == (!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet));
 
         // Start new block file
