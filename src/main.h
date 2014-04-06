@@ -33,7 +33,7 @@ static const unsigned int MAX_INV_SZ = 50000;
 static const int64 MIN_TX_FEE = 10 * CENT;
 static const int64 MIN_RELAY_TX_FEE = 10 * CENT;
 static const int64 MAX_MONEY = 10001051100 * COIN;			// 10 bil + POW of 1 coin for 1 year
-static const int64 BLAST_MONEY = 100000000;
+static const int64 BLAST_MONEY = 100000000 * COIN;
 static const int64 MAX_MINT_PROOF_OF_STAKE = 0.075 * COIN;	// 7.5% annual interest
 static const int CUTOFF_POW_BLOCK = 1051200;
 
@@ -49,8 +49,8 @@ static const int fHaveUPnP = true;
 static const int fHaveUPnP = false;
 #endif
 
-static const uint256 hashGenesisBlockOfficial("0x3392450fdacdbb8ed3d7ade085d66bac4ce6fe361bd58617edff508fda7b0114");
-static const uint256 hashGenesisBlockTestNet ("0x3392450fdacdbb8ed3d7ade085d66bac4ce6fe361bd58617edff508fda7b0114");
+static const uint256 hashGenesisBlockOfficial("0x00000549a06b82bd00b6918271f1b3ca74a3d94ba4089acaa410950c19bd247d");
+static const uint256 hashGenesisBlockTestNet ("0x00000549a06b82bd00b6918271f1b3ca74a3d94ba4089acaa410950c19bd247d");
 
 static const int64 nMaxClockDrift = 2 * 60 * 60;        // two hours
 
