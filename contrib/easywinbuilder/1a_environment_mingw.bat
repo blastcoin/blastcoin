@@ -15,14 +15,14 @@
 %MINGWPATH%\bin\mingw-get install msys-unzip-bin
 %MINGWPATH%\bin\mingw-get install msys-perl
 
-%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "gcc=4.6.*"
-%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "gcc-g++=4.6.*"
-%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "gcc-bin=4.6.*"
+%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "gcc=4.8.*"
+%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "gcc-g++=4.8.*"
+%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "gcc-bin=4.8.*"
 
 %MINGWPATH%\bin\mingw-get install --reinstall --recursive libgmp-dll="5.0.1-*"
 %MINGWPATH%\bin\mingw-get install --reinstall --recursive  mingwrt-dev
-%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "w32api=3.17-2"
-%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "w32api-dev=3.17-2"
+%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "w32api=4.0.3-1"
+%MINGWPATH%\bin\mingw-get.exe install --reinstall --recursive "w32api-dev=4.0.3-1"
 
 @rem There is a problem with MSYS bash and sh that stalls OpenSSL config on some systems. Using rxvt shell as a workaround.
 %MINGWPATH%\bin\mingw-get install msys-rxvt

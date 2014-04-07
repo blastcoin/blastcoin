@@ -2,7 +2,7 @@
 @bash patch_files.sh
 @echo Building Bitcoin daemon...
 @rem todo: rewrite this with ^ line wrapping
-@set PARAMS=BOOST_SUFFIX=%BOOSTSUFFIX%
+@set PARAMS=BOOST_SUFFIX=-mgw48-mt-s-1_54
 @set PARAMS=%PARAMS% INCLUDEPATHS="
 @rem set PARAMS=%PARAMS%-I'../src'
 @set PARAMS=%PARAMS% -I'../%EWBLIBS%/%BOOST%'
@@ -30,7 +30,7 @@
 @if errorlevel 1 goto error
 @echo.
 @echo.
-@strip %COINNAME%.exe
+@strip %COINNAME%d.exe
 @if errorlevel 1 goto error
 @echo !!!!!!! %COINNAME% daemon DONE: Find %COINNAME%d.exe in ./src :)
 @echo.
